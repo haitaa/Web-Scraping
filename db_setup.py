@@ -54,6 +54,19 @@ if conn and cursor:
     );
     """)
 
+    burclar = [
+    "Koç", "Boğa", "Ikizler", "Yengeç", "Aslan", "Başak",
+    "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"
+]
+
+    for burc in burclar:
+      cursor.execute(f"""
+      CREATE TABLE IF NOT EXISTS `{burc}` (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        word VARCHAR(255) UNIQUE NOT NULL
+      );
+      """)
+
     # Değişiklikleri kaydet
     conn.commit()
   except mysql.connector.Error as error:

@@ -28,7 +28,7 @@ def disconnect_from_server(conn, cursor):
   except mysql.connector.Error as error:
     print(f"Bağlantı kapatılırken hata oluştu: {error}")
 
-def save_words_to_sql(word_list):
+def save_words_to_sql(word_list, zodiac_name):
   conn, cursor = connect_to_server()
 
   if conn is None or cursor is None:
@@ -37,7 +37,7 @@ def save_words_to_sql(word_list):
 
   for word in word_list:
     try:
-      cursor.execute("INSERT IGNORE INTO words (word) VALUES (%s)", (word,))
+      cursor.execute(f"INSERT IGNORE INTO `{zodiac_name}` (word) VALUES (%s)", (word,))
     except mysql.connector.Error as error:
       print(f"Kelime kaydedilirken hata oluştu: {error}")
       continue

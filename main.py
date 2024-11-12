@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import io
 import random
+import mysql.connector
 
 from scrape import scrape_website, split_dom_content, extract_body_content, clean_and_process_text
 from parse import parse_with_ollama
@@ -10,6 +11,7 @@ from db_utils import save_words_to_sql
 from db_utils import fetch_data_from_db, fetch_table_names
 from crawler import search_google_selenium
 from save_loc import save_to_csv
+from utils import find_zodiac_in_topic
 
 PAGES = {
   "Ana Sayfa": "home",
@@ -17,6 +19,7 @@ PAGES = {
   "Yapay Zeka Kullanarak Veri Çekme ve İşleme": "scraping",
   "Veri İndirme": "download",
 }
+
 
 # Navbar
 st.sidebar.title("Navbar")
@@ -141,9 +144,19 @@ elif page == "Online Crawler":
       body_content = extract_body_content(html_body)
       cleaned_content = clean_and_process_text(body_content)
 
+      burclar = [
+        "Koç", "Boğa", "Ikizler", "Yengeç", "Aslan", "Başak",
+        "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"
+      ]
+
+      zodiac = find_zodiac_in_topic(topic, burclar)
+
+
       # Temizlenmiş içerik ve kelimeleri session_state'e kaydediyoruz
       st.session_state.dom_content = cleaned_content
       words = metni_duzenle(cleaned_content)
+
+      st.subheader(f"zodiac: {zodiac.capitalize()}") 
 
       json = {"kelimeler": words}
 
@@ -158,6 +171,15 @@ elif page == "Online Crawler":
 
         st.subheader("Temizlenmiş İçerik")
         st.text_area("", cleaned_content, height=300)
+
+        try:
+          if zodiac != "":
+            save_words_to_sql(list(json["kelimeler"]), zodiac_name=zodiac)
+          else: 
+            save_words_to_sql(list(json["kelimeler"]), zodiac_name="words")
+        except mysql.connector.Error as error:
+          print(f"Kelimeleri veritabanına kaydedilirken hata oluştu: {error}")
+        
 
         # Kelimeleiri DataFrame'e dönüştür.
         df = pd.DataFrame(words, columns=["Tokenized Words"])
