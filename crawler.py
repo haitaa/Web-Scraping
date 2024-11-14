@@ -13,8 +13,8 @@ def search_google_selenium(query):
   chrome_driver_path = "./chromedriver"
   options = webdriver.ChromeOptions()
   options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
-  #options.add_argument("--headless")
-  #options.add_argument("--disable-gpu")
+  options.add_argument("--headless")
+  options.add_argument("--disable-gpu")
 
   driver = webdriver.Chrome(service=Service(chrome_driver_path), options=options)
 
